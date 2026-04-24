@@ -4,123 +4,238 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>English Listening Spelling Practice</title>
+    <meta
+      name="description"
+      content="An independent English listening spelling practice website for exam-style preparation."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <main class="app">
-      <section class="hero">
+    <main class="app-shell">
+      <section class="hero panel">
+        <div class="hero-copy">
+          <p class="eyebrow">Unofficial Exam Practice</p>
+          <h1>Train your ear, sharpen your spelling, stay calm on test day.</h1>
+          <p class="subtitle">
+            An independent listening-spelling trainer built for fast, repeatable exam-style practice with timers, batch study, and difficulty filters.
+          </p>
+
+          <div class="hero-points">
+            <span>Timed batches</span>
+            <span>Medium + hard words</span>
+            <span>Non-repeating practice pool</span>
+          </div>
+
+          <div class="trust-note">
+            <strong>Important:</strong> This is an unofficial practice website. It is not affiliated with, endorsed by, or sponsored by IELTS, IDP, the British Council, or Cambridge.
+          </div>
+        </div>
+
+        <aside class="hero-side">
+          <div class="score-card">
+            <p>Batch Score</p>
+            <h2><span id="score">0</span>/<span id="total">0</span></h2>
+            <span class="score-caption">Track your accuracy one batch at a time</span>
+          </div>
+
+          <div class="creator-card">
+            <p class="creator-label">Built by</p>
+            <h3>Ujjawal Poudel</h3>
+            <p>
+              Made for personal IELTS exam practice with help from Codex AI so the tool could be built in a short period of time.
+            </p>
+            <a
+              class="creator-link"
+              href="https://www.linkedin.com/in/ujjawalpoudel/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Connect on LinkedIn
+            </a>
+          </div>
+        </aside>
+      </section>
+
+      <section class="highlights">
+        <article class="highlight-card">
+          <p class="highlight-label">Why It Helps</p>
+          <h3>Designed to reduce panic during dictation-style listening.</h3>
+          <p>Focused batches, visible timing, repetition controls, and difficulty filtering keep the task simple when the words get tricky.</p>
+        </article>
+
+        <article class="highlight-card">
+          <p class="highlight-label">Practice Flow</p>
+          <h3>Listen, type, review, repeat.</h3>
+          <p>Use smaller batches to build confidence or larger ones to simulate exam pressure without repeating the same words too soon.</p>
+        </article>
+
+        <article class="highlight-card">
+          <p class="highlight-label">Independent Tool</p>
+          <h3>Built for learning, not official test content.</h3>
+          <p>Use it as a personal companion for spelling accuracy and listening confidence alongside your broader exam preparation.</p>
+        </article>
+      </section>
+
+      <section class="workspace-grid">
+        <section class="panel practice-panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">Practice Workspace</p>
+              <h2>Current training session</h2>
+            </div>
+            <div class="session-chip">Personal practice mode</div>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-info">
+              <span id="progressText">Ready to start</span>
+              <span id="accuracyText">Accuracy: 0%</span>
+            </div>
+            <div class="progress-bar">
+              <div id="progressFill"></div>
+            </div>
+          </div>
+
+          <div class="quiz-card">
+            <div id="statusIcon" class="status-icon">🎧</div>
+
+            <label class="question-label" for="answerInput">Listen and type the word</label>
+
+            <div class="controls-grid">
+              <div class="control-group">
+                <label for="difficultySelect">Difficulty</label>
+                <select id="difficultySelect">
+                  <option value="all" selected>All</option>
+                  <option value="medium">Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </div>
+
+              <div class="control-group">
+                <label for="batchSelect">Words per batch</label>
+                <select id="batchSelect">
+                  <option value="10" selected>10 words</option>
+                  <option value="20">20 words</option>
+                  <option value="30">30 words</option>
+                  <option value="40">40 words</option>
+                  <option value="50">50 words</option>
+                </select>
+              </div>
+
+              <div class="control-group">
+                <label for="timerSelect">Time per word</label>
+                <select id="timerSelect">
+                  <option value="5">5 seconds</option>
+                  <option value="7" selected>7 seconds</option>
+                  <option value="10">10 seconds</option>
+                </select>
+              </div>
+
+              <div class="control-group timer-pill-wrap">
+                <span class="timer-pill-label">Countdown</span>
+                <div id="timerDisplay" class="timer-display">7.0s</div>
+              </div>
+            </div>
+
+            <input
+              id="answerInput"
+              type="text"
+              placeholder="Type the spelling here..."
+              autocomplete="off"
+            />
+
+            <div id="feedback" class="feedback" aria-live="polite"></div>
+
+            <div class="buttons">
+              <button id="startBtn" class="btn primary">Start Next Batch</button>
+              <button id="pauseBtn" class="btn">Pause</button>
+              <button id="resetBtn" class="btn">Reset Practice</button>
+              <button id="repeatBtn" class="btn">Repeat Word</button>
+              <button id="submitBtn" class="btn success">Submit</button>
+            </div>
+
+            <p class="shortcut">
+              Start gives you the next non-repeating batch. Pause freezes the timer. Reset restarts the same batch from word 1. Press <b>Ctrl + R</b> to repeat the current word.
+            </p>
+          </div>
+        </section>
+
+        <aside class="side-column">
+          <section class="panel side-panel">
+            <p class="panel-kicker">How To Use</p>
+            <h3>Practice with less friction</h3>
+            <ul class="clean-list">
+              <li>Choose medium, hard, or all based on your confidence.</li>
+              <li>Keep batches short for focused revision or longer for pressure training.</li>
+              <li>Pause when needed, then resume with the remaining time still intact.</li>
+            </ul>
+          </section>
+
+          <section class="panel side-panel">
+            <p class="panel-kicker">Load Your Own List</p>
+            <h3>Bring your own spelling set</h3>
+
+            <div class="tool-card compact-card">
+              <h4>Upload JSON File</h4>
+              <p>Upload your own spelling practice word list.</p>
+              <input id="fileInput" type="file" accept=".json" />
+            </div>
+
+            <div class="tool-card compact-card">
+              <h4>Paste Words</h4>
+              <p>Paste words separated by commas or new lines.</p>
+              <textarea id="pasteInput" placeholder="accommodation&#10;environment&#10;government"></textarea>
+              <button id="loadPasteBtn" class="btn primary full">Load Pasted Words</button>
+            </div>
+          </section>
+        </aside>
+      </section>
+
+      <section class="history-layout">
+        <section class="history-card">
+          <h3>Practice History</h3>
+          <div id="historyList" class="history-list">
+            <p class="empty">No attempts yet.</p>
+          </div>
+        </section>
+
+        <section class="history-card note-card">
+          <h3>About This Project</h3>
+          <p>
+            This tool was created by <strong>Ujjawal Poudel</strong> for personal IELTS listening spelling practice and refined quickly with help from <strong>Codex AI</strong>.
+          </p>
+          <p>
+            It is built for independent learning, branding clarity, and future improvement rather than as an official exam product.
+          </p>
+          <p>
+            Future collaborators are welcome to help improve the experience, dataset quality, accessibility, and study features.
+          </p>
+        </section>
+      </section>
+
+      <footer class="site-footer">
         <div>
-        <p class="badge">Unofficial Exam Practice</p>
-        <h1>English Listening Spelling Practice</h1>
-        <p class="subtitle">
-          Practice listening-based spelling with timed word sets built for exam-style preparation.
-        </p>
-        <p class="disclaimer">
-          This is an independent practice website. It is not affiliated with, endorsed by, or sponsored by IELTS, IDP, the British Council, or Cambridge.
-        </p>
+          <p class="footer-title">Built by Ujjawal Poudel</p>
+          <p class="footer-copy">
+            Personal exam-practice project, shaped with Codex AI, shared as an unofficial learning tool.
+          </p>
         </div>
 
-      <div class="score-card">
-        <p>Score</p>
-        <h2><span id="score">0</span>/<span id="total">0</span></h2>
-      </div>
-    </section>
-
-    <section class="panel">
-      <div class="progress-wrap">
-        <div class="progress-info">
-          <span id="progressText">Ready to start</span>
-          <span id="accuracyText">Accuracy: 0%</span>
+        <div class="footer-links">
+          <a href="https://www.linkedin.com/in/ujjawalpoudel/" target="_blank" rel="noreferrer">
+            LinkedIn
+          </a>
+          <span>Independent practice only</span>
         </div>
-        <div class="progress-bar">
-          <div id="progressFill"></div>
-        </div>
-      </div>
+      </footer>
+    </main>
 
-      <div class="quiz-card">
-        <div id="statusIcon" class="status-icon">🎧</div>
-
-        <p class="question-label">Listen and type the word</p>
-
-        <div class="timer-row">
-          <label for="difficultySelect">Difficulty</label>
-          <select id="difficultySelect">
-            <option value="all" selected>All</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-          </select>
-
-          <label for="batchSelect">Words per batch</label>
-          <select id="batchSelect">
-            <option value="10" selected>10 words</option>
-            <option value="20">20 words</option>
-            <option value="30">30 words</option>
-            <option value="40">40 words</option>
-            <option value="50">50 words</option>
-          </select>
-
-          <label for="timerSelect">Time per word</label>
-          <select id="timerSelect">
-            <option value="5">5 seconds</option>
-            <option value="7" selected>7 seconds</option>
-            <option value="10">10 seconds</option>
-          </select>
-          <div id="timerDisplay" class="timer-display">7.0s</div>
-        </div>
-
-        <input
-          id="answerInput"
-          type="text"
-          placeholder="Type spelling here..."
-          autocomplete="off"
-        />
-
-        <div id="feedback" class="feedback"></div>
-
-        <div class="buttons">
-          <button id="startBtn" class="btn primary">Start Next Batch</button>
-          <button id="pauseBtn" class="btn">Pause</button>
-          <button id="resetBtn" class="btn">Reset Practice</button>
-          <button id="repeatBtn" class="btn">Repeat Word</button>
-          <button id="submitBtn" class="btn success">Submit</button>
-        </div>
-
-        <p class="shortcut">
-          Start gives you the next non-repeating batch. Pause freezes the timer. Reset restarts the same batch from word 1. Press <b>Ctrl + R</b> to repeat the current word.
-        </p>
-      </div>
-    </section>
-
-    <section class="tools">
-      <div class="tool-card">
-        <h3>Upload JSON File</h3>
-        <p>Upload your own spelling practice word list.</p>
-        <input id="fileInput" type="file" accept=".json" />
-      </div>
-
-      <div class="tool-card">
-        <h3>Paste Words</h3>
-        <p>Paste words separated by commas or new lines.</p>
-        <textarea id="pasteInput" placeholder="accommodation&#10;environment&#10;government"></textarea>
-        <button id="loadPasteBtn" class="btn primary full">Load Pasted Words</button>
-      </div>
-    </section>
-
-    <section class="history-card">
-      <h3>Practice History</h3>
-      <div id="historyList" class="history-list">
-        <p class="empty">No attempts yet.</p>
-      </div>
-    </section>
-
-    <section class="history-card">
-      <h3>Important Note</h3>
-      <p class="empty">
-        This tool is for independent spelling practice only. Brand names mentioned by users or in custom word lists remain the property of their respective owners.
-      </p>
-    </section>
-  </main>
-
-  <script src="app.js"></script>
-</body>
+    <script src="app.js"></script>
+  </body>
 </html>
