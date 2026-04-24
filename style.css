@@ -138,7 +138,8 @@ h1 {
   font-weight: 700;
 }
 
-#timerSelect {
+#timerSelect,
+#batchSelect {
   border: 1px solid #cbd5e1;
   border-radius: 12px;
   padding: 10px 14px;

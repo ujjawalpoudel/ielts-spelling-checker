@@ -40,6 +40,15 @@
         <p class="question-label">Listen and type the word</p>
 
         <div class="timer-row">
+          <label for="batchSelect">Words per batch</label>
+          <select id="batchSelect">
+            <option value="10" selected>10 words</option>
+            <option value="20">20 words</option>
+            <option value="30">30 words</option>
+            <option value="40">40 words</option>
+            <option value="50">50 words</option>
+          </select>
+
           <label for="timerSelect">Time per word</label>
           <select id="timerSelect">
             <option value="5" selected>5 seconds</option>
@@ -59,14 +68,14 @@
         <div id="feedback" class="feedback"></div>
 
         <div class="buttons">
-          <button id="startBtn" class="btn primary">Start Practice</button>
+          <button id="startBtn" class="btn primary">Start Next Batch</button>
           <button id="resetBtn" class="btn">Reset Practice</button>
           <button id="repeatBtn" class="btn">Repeat Word</button>
           <button id="submitBtn" class="btn success">Submit</button>
         </div>
 
         <p class="shortcut">
-          Reset restarts the same practice words from the beginning. Press <b>Ctrl + R</b> to repeat the current word.
+          Start gives you the next non-repeating batch. Reset restarts the same batch from word 1. Press <b>Ctrl + R</b> to repeat the current word.
         </p>
       </div>
     </section>

@@ -1,4 +1,5 @@
 let words = [];
+let remainingWords = [];
 let practiceWords = [];
 let currentWord = "";
 let currentIndex = 0;
@@ -18,6 +19,7 @@ const answerInput = document.getElementById("answerInput");
 const feedback = document.getElementById("feedback");
 const historyList = document.getElementById("historyList");
 const statusIcon = document.getElementById("statusIcon");
+const batchSelect = document.getElementById("batchSelect");
 const timerSelect = document.getElementById("timerSelect");
 const timerDisplay = document.getElementById("timerDisplay");
 
@@ -34,11 +36,11 @@ async function loadDefaultWords() {
     const response = await fetch("words.json");
     const data = await response.json();
     words = cleanWords(data);
-    practiceWords = [];
+    resetWordPool();
     updateTotal();
   } catch {
     words = [];
-    practiceWords = [];
+    resetWordPool();
     showFeedback("Could not load words.json", "wrong");
   }
 }
@@ -73,8 +75,25 @@ function shuffle(array) {
   return array.sort(() => Math.random() - 0.5);
 }
 
+function resetWordPool() {
+  remainingWords = [];
+  practiceWords = [];
+  currentWord = "";
+  currentIndex = 0;
+  score = 0;
+  attempts = 0;
+  answered = false;
+  clearAutoAdvance();
+  clearCountdown();
+  updateTimerDisplay(getSelectedSeconds());
+}
+
 function getSelectedSeconds() {
   return Number(timerSelect.value) || 5;
+}
+
+function getSelectedBatchSize() {
+  return Number(batchSelect.value) || 10;
 }
 
 function updateTimerDisplay(seconds) {
@@ -87,13 +106,20 @@ function startPractice() {
     return;
   }
 
-  practiceWords = shuffle([...words]);
-  restartPractice();
+  if (remainingWords.length === 0) {
+    remainingWords = shuffle([...words]);
+  }
+
+  const batchSize = Math.min(getSelectedBatchSize(), remainingWords.length);
+  practiceWords = remainingWords.slice(0, batchSize);
+  remainingWords = remainingWords.slice(batchSize);
+
+  restartPractice(`Starting a ${practiceWords.length}-word batch. ${remainingWords.length} words left after this batch.`);
 }
 
-function restartPractice() {
+function restartPractice(message = "Practice reset. Starting again from word 1.") {
   if (practiceWords.length === 0) {
-    showFeedback("Start a practice set first.", "wrong");
+    showFeedback("Start a batch first.", "wrong");
     return;
   }
 
@@ -107,7 +133,7 @@ function restartPractice() {
   historyList.innerHTML = `<p class="empty">No attempts yet.</p>`;
   updateScore();
   loadQuestion();
-  showFeedback("Practice reset. Starting again from word 1.", "correct");
+  showFeedback(message, "correct");
 }
 
 function loadQuestion() {
@@ -117,9 +143,12 @@ function loadQuestion() {
   if (currentIndex >= practiceWords.length) {
     currentWord = "";
     statusIcon.textContent = "🏆";
-    progressText.textContent = "Practice completed";
+    progressText.textContent = remainingWords.length > 0
+      ? `Batch completed. ${remainingWords.length} words remaining in the pool`
+      : "Batch completed. All loaded words have been used";
     updateTimerDisplay(0);
-    showFeedback(`Finished! Final score: ${score}/${practiceWords.length}`, "correct");
+    showFeedback(`Finished this batch! Score: ${score}/${practiceWords.length}`, "correct");
+    updateProgress();
     return;
   }
 
@@ -132,7 +161,7 @@ function loadQuestion() {
   feedback.className = "feedback";
   statusIcon.textContent = "🎧";
 
-  progressText.textContent = `Word ${currentIndex + 1} of ${practiceWords.length}`;
+  progressText.textContent = `Word ${currentIndex + 1} of ${practiceWords.length} | ${remainingWords.length} words still unused`;
   updateProgress();
   startCountdown();
 
@@ -242,15 +271,16 @@ function clearAutoAdvance() {
 
 function updateScore() {
   scoreEl.textContent = score;
-  totalEl.textContent = words.length;
+  totalEl.textContent = practiceWords.length || words.length;
 
   const accuracy = attempts === 0 ? 0 : Math.round((score / attempts) * 100);
   accuracyText.textContent = `Accuracy: ${accuracy}%`;
 }
 
 function updateTotal() {
-  totalEl.textContent = words.length;
+  totalEl.textContent = practiceWords.length || words.length;
   progressText.textContent = `${words.length} words loaded`;
+  updateProgress();
 }
 
 function updateProgress() {
@@ -293,7 +323,7 @@ fileInput.addEventListener("change", event => {
     try {
       const data = JSON.parse(e.target.result);
       words = cleanWords(data);
-      practiceWords = [];
+      resetWordPool();
       updateTotal();
       showFeedback(`${words.length} words loaded from JSON file.`, "correct");
     } catch {
@@ -318,7 +348,7 @@ loadPasteBtn.addEventListener("click", () => {
     .filter(Boolean);
 
   words = [...new Set(words)];
-  practiceWords = [];
+  resetWordPool();
 
   updateTotal();
   showFeedback(`${words.length} pasted words loaded.`, "correct");
@@ -354,7 +384,7 @@ document.addEventListener("keydown", event => {
 });
 
 startBtn.addEventListener("click", startPractice);
-resetBtn.addEventListener("click", restartPractice);
+resetBtn.addEventListener("click", () => restartPractice());
 repeatBtn.addEventListener("click", speakWord);
 submitBtn.addEventListener("click", () => checkAnswer());
 
