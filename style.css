@@ -564,9 +564,14 @@ textarea {
   padding: 20px 24px;
   border-radius: 24px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   gap: 16px;
+}
+
+.footer-identity {
+  display: grid;
+  gap: 6px;
 }
 
 .footer-name {
@@ -582,6 +587,7 @@ textarea {
 
 .footer a {
   color: var(--brand-deep);
+  width: fit-content;
 }
 
 .btn:focus-visible,
