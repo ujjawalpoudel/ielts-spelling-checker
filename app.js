@@ -19,6 +19,7 @@ let remainingSeconds = 0;
 const scoreEl = document.getElementById("score");
 const totalEl = document.getElementById("total");
 const progressText = document.getElementById("progressText");
+const overallProgressEl = document.getElementById("overallProgress");
 const accuracyText = document.getElementById("accuracyText");
 const progressFill = document.getElementById("progressFill");
 const answerInput = document.getElementById("answerInput");
@@ -125,6 +126,7 @@ function resetWordPool() {
   clearCountdown();
   updatePauseButton();
   updateTimerDisplay(getSelectedSeconds());
+  updateOverallProgress();
   updateProgress();
 }
 
@@ -369,7 +371,17 @@ function updateScore() {
 function updateTotal() {
   totalEl.textContent = practiceWords.length || getAvailableWords().length;
   progressText.textContent = `${getAvailableWords().length} ${getSelectedDifficulty()} words loaded`;
+  updateOverallProgress();
   updateProgress();
+}
+
+function updateOverallProgress() {
+  const availableCount = getAvailableWords().length;
+  const usedOutsideCurrentBatch = Math.max(0, availableCount - remainingWords.length - practiceWords.length);
+  const completedInsideCurrentBatch = Math.min(currentIndex, practiceWords.length);
+  const completedTotal = usedOutsideCurrentBatch + completedInsideCurrentBatch;
+
+  overallProgressEl.textContent = `${completedTotal}/${availableCount} completed`;
 }
 
 function updateProgress() {
@@ -378,6 +390,7 @@ function updateProgress() {
     : Math.round((currentIndex / practiceWords.length) * 100);
 
   progressFill.style.width = `${percentage}%`;
+  updateOverallProgress();
 }
 
 function showFeedback(message, type) {
