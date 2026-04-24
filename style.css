@@ -126,6 +126,37 @@ h1 {
   font-weight: 700;
 }
 
+.timer-row {
+  width: min(520px, 100%);
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  color: #475569;
+  font-weight: 700;
+}
+
+#timerSelect {
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 10px 14px;
+  background: #fff;
+  color: #172033;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.timer-display {
+  min-width: 82px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-weight: 800;
+}
+
 #answerInput {
   width: min(520px, 100%);
   padding: 18px 20px;
@@ -280,5 +311,9 @@ textarea {
   .progress-info {
     flex-direction: column;
     gap: 6px;
+  }
+
+  .timer-row {
+    justify-content: center;
   }
 }

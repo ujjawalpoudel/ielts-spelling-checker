@@ -39,6 +39,17 @@
 
         <p class="question-label">Listen and type the word</p>
 
+        <div class="timer-row">
+          <label for="timerSelect">Time per word</label>
+          <select id="timerSelect">
+            <option value="3">3 seconds</option>
+            <option value="5" selected>5 seconds</option>
+            <option value="7">7 seconds</option>
+            <option value="10">10 seconds</option>
+          </select>
+          <div id="timerDisplay" class="timer-display">5.0s</div>
+        </div>
+
         <input
           id="answerInput"
           type="text"
@@ -56,7 +67,7 @@
         </div>
 
         <p class="shortcut">
-          Press <b>Enter</b> to submit. The next word loads automatically. Press <b>Ctrl + R</b> to repeat.
+          The answer checks automatically when you type the full correct word or when the timer ends. Press <b>Ctrl + R</b> to repeat.
         </p>
       </div>
     </section>

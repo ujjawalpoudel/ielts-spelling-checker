@@ -5,6 +5,8 @@ let score = 0;
 let attempts = 0;
 let answered = false;
 let autoAdvanceTimer = null;
+let countdownInterval = null;
+let countdownEndsAt = 0;
 
 const scoreEl = document.getElementById("score");
 const totalEl = document.getElementById("total");
@@ -15,6 +17,8 @@ const answerInput = document.getElementById("answerInput");
 const feedback = document.getElementById("feedback");
 const historyList = document.getElementById("historyList");
 const statusIcon = document.getElementById("statusIcon");
+const timerSelect = document.getElementById("timerSelect");
+const timerDisplay = document.getElementById("timerDisplay");
 
 const startBtn = document.getElementById("startBtn");
 const repeatBtn = document.getElementById("repeatBtn");
@@ -66,6 +70,14 @@ function shuffle(array) {
   return array.sort(() => Math.random() - 0.5);
 }
 
+function getSelectedSeconds() {
+  return Number(timerSelect.value) || 5;
+}
+
+function updateTimerDisplay(seconds) {
+  timerDisplay.textContent = `${seconds.toFixed(1)}s`;
+}
+
 function startPractice() {
   if (words.length === 0) {
     showFeedback("Please load some words first.", "wrong");
@@ -73,6 +85,7 @@ function startPractice() {
   }
 
   clearAutoAdvance();
+  clearCountdown();
   words = shuffle([...words]);
   currentIndex = 0;
   score = 0;
@@ -86,11 +99,13 @@ function startPractice() {
 
 function loadQuestion() {
   clearAutoAdvance();
+  clearCountdown();
 
   if (currentIndex >= words.length) {
     currentWord = "";
     statusIcon.textContent = "🏆";
     progressText.textContent = "Practice completed";
+    updateTimerDisplay(0);
     showFeedback(`Finished! Final score: ${score}/${words.length}`, "correct");
     return;
   }
@@ -106,8 +121,32 @@ function loadQuestion() {
 
   progressText.textContent = `Word ${currentIndex + 1} of ${words.length}`;
   updateProgress();
+  startCountdown();
 
   setTimeout(speakWord, 300);
+}
+
+function startCountdown() {
+  const seconds = getSelectedSeconds();
+  countdownEndsAt = Date.now() + seconds * 1000;
+  updateTimerDisplay(seconds);
+
+  countdownInterval = setInterval(() => {
+    const remaining = Math.max(0, (countdownEndsAt - Date.now()) / 1000);
+    updateTimerDisplay(remaining);
+
+    if (remaining <= 0) {
+      clearCountdown();
+      checkAnswer(true);
+    }
+  }, 100);
+}
+
+function clearCountdown() {
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+  }
 }
 
 function speakWord() {
@@ -127,18 +166,19 @@ function normalize(text) {
   return text.trim().toLowerCase();
 }
 
-function checkAnswer() {
+function checkAnswer(fromTimer = false) {
   if (!currentWord || answered) return;
 
-  const userAnswer = answerInput.value;
+  const userAnswer = answerInput.value.trim();
 
-  if (!userAnswer.trim()) {
+  if (!userAnswer && !fromTimer) {
     showFeedback("Please type your answer first.", "wrong");
     return;
   }
 
   answered = true;
   attempts++;
+  clearCountdown();
 
   const isCorrect = normalize(userAnswer) === normalize(currentWord);
 
@@ -146,12 +186,15 @@ function checkAnswer() {
     score++;
     statusIcon.textContent = "✅";
     showFeedback("Correct!", "correct");
+  } else if (!userAnswer) {
+    statusIcon.textContent = "⏰";
+    showFeedback(`Time is up! Correct spelling: ${currentWord}`, "wrong");
   } else {
     statusIcon.textContent = "❌";
     showFeedback(`Wrong! Correct spelling: ${currentWord}`, "wrong");
   }
 
-  addHistory(userAnswer, currentWord, isCorrect);
+  addHistory(userAnswer || "(no answer)", currentWord, isCorrect);
   updateScore();
   updateProgress();
   scheduleNextQuestion();
@@ -161,7 +204,7 @@ function nextQuestion() {
   if (!currentWord) return;
 
   if (!answered) {
-    showFeedback("Submit your answer before going next.", "wrong");
+    checkAnswer(true);
     return;
   }
 
@@ -172,7 +215,8 @@ function nextQuestion() {
 function scheduleNextQuestion() {
   clearAutoAdvance();
   autoAdvanceTimer = setTimeout(() => {
-    nextQuestion();
+    currentIndex++;
+    loadQuestion();
   }, 900);
 }
 
@@ -265,8 +309,26 @@ loadPasteBtn.addEventListener("click", () => {
   showFeedback(`${words.length} pasted words loaded.`, "correct");
 });
 
+answerInput.addEventListener("input", () => {
+  if (!currentWord || answered) return;
+
+  if (normalize(answerInput.value) === normalize(currentWord)) {
+    checkAnswer();
+  }
+});
+
+timerSelect.addEventListener("change", () => {
+  updateTimerDisplay(getSelectedSeconds());
+
+  if (currentWord && !answered) {
+    clearCountdown();
+    startCountdown();
+  }
+});
+
 document.addEventListener("keydown", event => {
   if (event.key === "Enter") {
+    event.preventDefault();
     checkAnswer();
   }
 
@@ -278,7 +340,8 @@ document.addEventListener("keydown", event => {
 
 startBtn.addEventListener("click", startPractice);
 repeatBtn.addEventListener("click", speakWord);
-submitBtn.addEventListener("click", checkAnswer);
+submitBtn.addEventListener("click", () => checkAnswer());
 nextBtn.addEventListener("click", nextQuestion);
 
+updateTimerDisplay(getSelectedSeconds());
 loadDefaultWords();
