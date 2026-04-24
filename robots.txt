@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ujjawalpoudel.github.io/ielts-spelling-checker/sitemap.xml

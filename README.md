@@ -56,6 +56,15 @@ Possible future ideas:
 
 Clone the project and open `index.html` in a browser, or serve it with any simple static server.
 
+## SEO Notes
+
+- The homepage now includes search-focused metadata, canonical tags, Open Graph tags, and structured data.
+- `robots.txt` and `sitemap.xml` are included for search engine discovery.
+- The current canonical and sitemap URLs assume GitHub Pages at:
+  `https://ujjawalpoudel.github.io/ielts-spelling-checker/`
+
+If you later move to a custom domain, update the canonical URL, structured data URL, `robots.txt`, and `sitemap.xml`.
+
 ## Notes
 
 Please avoid presenting this project as an official exam product, and avoid adding copyrighted official exam materials verbatim.
