@@ -1,4 +1,5 @@
 let words = [];
+let practiceWords = [];
 let currentWord = "";
 let currentIndex = 0;
 let score = 0;
@@ -21,9 +22,9 @@ const timerSelect = document.getElementById("timerSelect");
 const timerDisplay = document.getElementById("timerDisplay");
 
 const startBtn = document.getElementById("startBtn");
+const resetBtn = document.getElementById("resetBtn");
 const repeatBtn = document.getElementById("repeatBtn");
 const submitBtn = document.getElementById("submitBtn");
-const nextBtn = document.getElementById("nextBtn");
 const fileInput = document.getElementById("fileInput");
 const pasteInput = document.getElementById("pasteInput");
 const loadPasteBtn = document.getElementById("loadPasteBtn");
@@ -33,9 +34,11 @@ async function loadDefaultWords() {
     const response = await fetch("words.json");
     const data = await response.json();
     words = cleanWords(data);
+    practiceWords = [];
     updateTotal();
   } catch {
     words = [];
+    practiceWords = [];
     showFeedback("Could not load words.json", "wrong");
   }
 }
@@ -84,9 +87,18 @@ function startPractice() {
     return;
   }
 
+  practiceWords = shuffle([...words]);
+  restartPractice();
+}
+
+function restartPractice() {
+  if (practiceWords.length === 0) {
+    showFeedback("Start a practice set first.", "wrong");
+    return;
+  }
+
   clearAutoAdvance();
   clearCountdown();
-  words = shuffle([...words]);
   currentIndex = 0;
   score = 0;
   attempts = 0;
@@ -95,22 +107,23 @@ function startPractice() {
   historyList.innerHTML = `<p class="empty">No attempts yet.</p>`;
   updateScore();
   loadQuestion();
+  showFeedback("Practice reset. Starting again from word 1.", "correct");
 }
 
 function loadQuestion() {
   clearAutoAdvance();
   clearCountdown();
 
-  if (currentIndex >= words.length) {
+  if (currentIndex >= practiceWords.length) {
     currentWord = "";
     statusIcon.textContent = "🏆";
     progressText.textContent = "Practice completed";
     updateTimerDisplay(0);
-    showFeedback(`Finished! Final score: ${score}/${words.length}`, "correct");
+    showFeedback(`Finished! Final score: ${score}/${practiceWords.length}`, "correct");
     return;
   }
 
-  currentWord = words[currentIndex];
+  currentWord = practiceWords[currentIndex];
   answered = false;
 
   answerInput.value = "";
@@ -119,7 +132,7 @@ function loadQuestion() {
   feedback.className = "feedback";
   statusIcon.textContent = "🎧";
 
-  progressText.textContent = `Word ${currentIndex + 1} of ${words.length}`;
+  progressText.textContent = `Word ${currentIndex + 1} of ${practiceWords.length}`;
   updateProgress();
   startCountdown();
 
@@ -241,9 +254,9 @@ function updateTotal() {
 }
 
 function updateProgress() {
-  const percentage = words.length === 0
+  const percentage = practiceWords.length === 0
     ? 0
-    : Math.round((currentIndex / words.length) * 100);
+    : Math.round((currentIndex / practiceWords.length) * 100);
 
   progressFill.style.width = `${percentage}%`;
 }
@@ -280,6 +293,7 @@ fileInput.addEventListener("change", event => {
     try {
       const data = JSON.parse(e.target.result);
       words = cleanWords(data);
+      practiceWords = [];
       updateTotal();
       showFeedback(`${words.length} words loaded from JSON file.`, "correct");
     } catch {
@@ -304,6 +318,7 @@ loadPasteBtn.addEventListener("click", () => {
     .filter(Boolean);
 
   words = [...new Set(words)];
+  practiceWords = [];
 
   updateTotal();
   showFeedback(`${words.length} pasted words loaded.`, "correct");
@@ -339,9 +354,9 @@ document.addEventListener("keydown", event => {
 });
 
 startBtn.addEventListener("click", startPractice);
+resetBtn.addEventListener("click", restartPractice);
 repeatBtn.addEventListener("click", speakWord);
 submitBtn.addEventListener("click", () => checkAnswer());
-nextBtn.addEventListener("click", nextQuestion);
 
 updateTimerDisplay(getSelectedSeconds());
 loadDefaultWords();

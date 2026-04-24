@@ -42,7 +42,6 @@
         <div class="timer-row">
           <label for="timerSelect">Time per word</label>
           <select id="timerSelect">
-            <option value="3">3 seconds</option>
             <option value="5" selected>5 seconds</option>
             <option value="7">7 seconds</option>
             <option value="10">10 seconds</option>
@@ -61,13 +60,13 @@
 
         <div class="buttons">
           <button id="startBtn" class="btn primary">Start Practice</button>
+          <button id="resetBtn" class="btn">Reset Practice</button>
           <button id="repeatBtn" class="btn">Repeat Word</button>
           <button id="submitBtn" class="btn success">Submit</button>
-          <button id="nextBtn" class="btn">Next</button>
         </div>
 
         <p class="shortcut">
-          The answer checks automatically when you type the full correct word or when the timer ends. Press <b>Ctrl + R</b> to repeat.
+          Reset restarts the same practice words from the beginning. Press <b>Ctrl + R</b> to repeat the current word.
         </p>
       </div>
     </section>
