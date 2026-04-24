@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IELTS Spelling Practice</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <div>
+        <p class="badge">IELTS Listening Practice</p>
+        <h1>Spelling Checker</h1>
+        <p class="subtitle">
+          Listen to the word, type the spelling, and check your accuracy.
+        </p>
+      </div>
+
+      <div class="score-card">
+        <p>Score</p>
+        <h2><span id="score">0</span>/<span id="total">0</span></h2>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="progress-wrap">
+        <div class="progress-info">
+          <span id="progressText">Ready to start</span>
+          <span id="accuracyText">Accuracy: 0%</span>
+        </div>
+        <div class="progress-bar">
+          <div id="progressFill"></div>
+        </div>
+      </div>
+
+      <div class="quiz-card">
+        <div id="statusIcon" class="status-icon">🎧</div>
+
+        <p class="question-label">Listen and type the word</p>
+
+        <input
+          id="answerInput"
+          type="text"
+          placeholder="Type spelling here..."
+          autocomplete="off"
+        />
+
+        <div id="feedback" class="feedback"></div>
+
+        <div class="buttons">
+          <button id="startBtn" class="btn primary">Start Practice</button>
+          <button id="repeatBtn" class="btn">Repeat Word</button>
+          <button id="submitBtn" class="btn success">Submit</button>
+          <button id="nextBtn" class="btn">Next</button>
+        </div>
+
+        <p class="shortcut">
+          Press <b>Enter</b> to submit, <b>Ctrl + R</b> to repeat
+        </p>
+      </div>
+    </section>
+
+    <section class="tools">
+      <div class="tool-card">
+        <h3>Upload JSON File</h3>
+        <p>Upload your own IELTS spelling word list.</p>
+        <input id="fileInput" type="file" accept=".json" />
+      </div>
+
+      <div class="tool-card">
+        <h3>Paste Words</h3>
+        <p>Paste words separated by commas or new lines.</p>
+        <textarea id="pasteInput" placeholder="accommodation&#10;environment&#10;government"></textarea>
+        <button id="loadPasteBtn" class="btn primary full">Load Pasted Words</button>
+      </div>
+    </section>
+
+    <section class="history-card">
+      <h3>Practice History</h3>
+      <div id="historyList" class="history-list">
+        <p class="empty">No attempts yet.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
