@@ -6,9 +6,11 @@ let currentIndex = 0;
 let score = 0;
 let attempts = 0;
 let answered = false;
+let isPaused = false;
 let autoAdvanceTimer = null;
 let countdownInterval = null;
 let countdownEndsAt = 0;
+let remainingSeconds = 0;
 
 const scoreEl = document.getElementById("score");
 const totalEl = document.getElementById("total");
@@ -24,6 +26,7 @@ const timerSelect = document.getElementById("timerSelect");
 const timerDisplay = document.getElementById("timerDisplay");
 
 const startBtn = document.getElementById("startBtn");
+const pauseBtn = document.getElementById("pauseBtn");
 const resetBtn = document.getElementById("resetBtn");
 const repeatBtn = document.getElementById("repeatBtn");
 const submitBtn = document.getElementById("submitBtn");
@@ -83,8 +86,11 @@ function resetWordPool() {
   score = 0;
   attempts = 0;
   answered = false;
+  isPaused = false;
+  remainingSeconds = 0;
   clearAutoAdvance();
   clearCountdown();
+  updatePauseButton();
   updateTimerDisplay(getSelectedSeconds());
 }
 
@@ -129,9 +135,12 @@ function restartPractice(message = "Practice reset. Starting again from word 1."
   score = 0;
   attempts = 0;
   answered = false;
+  isPaused = false;
+  remainingSeconds = 0;
 
   historyList.innerHTML = `<p class="empty">No attempts yet.</p>`;
   updateScore();
+  updatePauseButton();
   loadQuestion();
   showFeedback(message, "correct");
 }
@@ -154,8 +163,11 @@ function loadQuestion() {
 
   currentWord = practiceWords[currentIndex];
   answered = false;
+  isPaused = false;
+  remainingSeconds = 0;
 
   answerInput.value = "";
+  answerInput.disabled = false;
   answerInput.focus();
   feedback.textContent = "";
   feedback.className = "feedback";
@@ -163,18 +175,20 @@ function loadQuestion() {
 
   progressText.textContent = `Word ${currentIndex + 1} of ${practiceWords.length} | ${remainingWords.length} words still unused`;
   updateProgress();
+  updatePauseButton();
   startCountdown();
 
   setTimeout(speakWord, 300);
 }
 
 function startCountdown() {
-  const seconds = getSelectedSeconds();
+  const seconds = remainingSeconds || getSelectedSeconds();
   countdownEndsAt = Date.now() + seconds * 1000;
   updateTimerDisplay(seconds);
 
   countdownInterval = setInterval(() => {
     const remaining = Math.max(0, (countdownEndsAt - Date.now()) / 1000);
+    remainingSeconds = remaining;
     updateTimerDisplay(remaining);
 
     if (remaining <= 0) {
@@ -189,6 +203,37 @@ function clearCountdown() {
     clearInterval(countdownInterval);
     countdownInterval = null;
   }
+}
+
+function togglePause() {
+  if (!currentWord || answered) {
+    showFeedback("Start a word first to use pause.", "wrong");
+    return;
+  }
+
+  if (isPaused) {
+    isPaused = false;
+    answerInput.disabled = false;
+    answerInput.focus();
+    statusIcon.textContent = "🎧";
+    updatePauseButton();
+    showFeedback("Practice resumed.", "correct");
+    startCountdown();
+    return;
+  }
+
+  isPaused = true;
+  clearCountdown();
+  clearAutoAdvance();
+  answerInput.disabled = true;
+  statusIcon.textContent = "⏸️";
+  updatePauseButton();
+  updateTimerDisplay(remainingSeconds || getSelectedSeconds());
+  showFeedback("Practice paused.", "correct");
+}
+
+function updatePauseButton() {
+  pauseBtn.textContent = isPaused ? "Resume" : "Pause";
 }
 
 function speakWord() {
@@ -220,7 +265,11 @@ function checkAnswer(fromTimer = false) {
 
   answered = true;
   attempts++;
+  isPaused = false;
+  remainingSeconds = 0;
   clearCountdown();
+  updatePauseButton();
+  answerInput.disabled = false;
 
   const isCorrect = normalize(userAnswer) === normalize(currentWord);
 
@@ -246,6 +295,9 @@ function nextQuestion() {
   if (!currentWord) return;
 
   if (!answered) {
+    isPaused = false;
+    answerInput.disabled = false;
+    updatePauseButton();
     checkAnswer(true);
     return;
   }
@@ -355,7 +407,7 @@ loadPasteBtn.addEventListener("click", () => {
 });
 
 answerInput.addEventListener("input", () => {
-  if (!currentWord || answered) return;
+  if (!currentWord || answered || isPaused) return;
 
   if (normalize(answerInput.value) === normalize(currentWord)) {
     checkAnswer();
@@ -367,6 +419,7 @@ timerSelect.addEventListener("change", () => {
 
   if (currentWord && !answered) {
     clearCountdown();
+    remainingSeconds = 0;
     startCountdown();
   }
 });
@@ -374,6 +427,7 @@ timerSelect.addEventListener("change", () => {
 document.addEventListener("keydown", event => {
   if (event.key === "Enter") {
     event.preventDefault();
+    if (isPaused) return;
     checkAnswer();
   }
 
@@ -384,9 +438,11 @@ document.addEventListener("keydown", event => {
 });
 
 startBtn.addEventListener("click", startPractice);
+pauseBtn.addEventListener("click", togglePause);
 resetBtn.addEventListener("click", () => restartPractice());
 repeatBtn.addEventListener("click", speakWord);
 submitBtn.addEventListener("click", () => checkAnswer());
 
+updatePauseButton();
 updateTimerDisplay(getSelectedSeconds());
 loadDefaultWords();
