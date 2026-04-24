@@ -4,6 +4,7 @@ let currentIndex = 0;
 let score = 0;
 let attempts = 0;
 let answered = false;
+let autoAdvanceTimer = null;
 
 const scoreEl = document.getElementById("score");
 const totalEl = document.getElementById("total");
@@ -71,6 +72,7 @@ function startPractice() {
     return;
   }
 
+  clearAutoAdvance();
   words = shuffle([...words]);
   currentIndex = 0;
   score = 0;
@@ -83,6 +85,8 @@ function startPractice() {
 }
 
 function loadQuestion() {
+  clearAutoAdvance();
+
   if (currentIndex >= words.length) {
     currentWord = "";
     statusIcon.textContent = "🏆";
@@ -150,6 +154,7 @@ function checkAnswer() {
   addHistory(userAnswer, currentWord, isCorrect);
   updateScore();
   updateProgress();
+  scheduleNextQuestion();
 }
 
 function nextQuestion() {
@@ -162,6 +167,20 @@ function nextQuestion() {
 
   currentIndex++;
   loadQuestion();
+}
+
+function scheduleNextQuestion() {
+  clearAutoAdvance();
+  autoAdvanceTimer = setTimeout(() => {
+    nextQuestion();
+  }, 900);
+}
+
+function clearAutoAdvance() {
+  if (autoAdvanceTimer) {
+    clearTimeout(autoAdvanceTimer);
+    autoAdvanceTimer = null;
+  }
 }
 
 function updateScore() {
