@@ -2,6 +2,8 @@
 
 An independent listening-spelling practice website built for personal IELTS exam preparation, fast repetition, and focused timed batches.
 
+Live website: [https://ujjawalpoudel.github.io/ielts-spelling-checker/](https://ujjawalpoudel.github.io/ielts-spelling-checker/)
+
 This project was created by **Ujjawal Poudel** and accelerated with help from **Codex AI** so it could be built in a short period of time for personal practice.
 
 ## Important Disclaimer
