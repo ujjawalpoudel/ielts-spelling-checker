@@ -5,6 +5,7 @@ let wordsByDifficulty = {
   hard: []
 };
 let remainingWords = [];
+let pendingWrongWords = [];
 let practiceWords = [];
 let currentWord = "";
 let currentIndex = 0;
@@ -12,6 +13,7 @@ let score = 0;
 let attempts = 0;
 let answered = false;
 let isPaused = false;
+let currentPracticeMode = "main";
 let autoAdvanceTimer = null;
 let countdownInterval = null;
 let remainingSeconds = 0;
@@ -32,6 +34,7 @@ const timerSelect = document.getElementById("timerSelect");
 const timerDisplay = document.getElementById("timerDisplay");
 
 const startBtn = document.getElementById("startBtn");
+const wrongWordsBtn = document.getElementById("wrongWordsBtn");
 const pauseBtn = document.getElementById("pauseBtn");
 const resetBtn = document.getElementById("resetBtn");
 const repeatBtn = document.getElementById("repeatBtn");
@@ -112,6 +115,7 @@ function getAvailableWords() {
 
 function resetWordPool() {
   remainingWords = [];
+  pendingWrongWords = [];
   practiceWords = [];
   currentWord = "";
   currentIndex = 0;
@@ -119,12 +123,14 @@ function resetWordPool() {
   attempts = 0;
   answered = false;
   isPaused = false;
+  currentPracticeMode = "main";
   remainingSeconds = 0;
   answerInput.value = "";
   answerInput.disabled = false;
   clearAutoAdvance();
   clearCountdown();
   updatePauseButton();
+  updateWrongWordsButton();
   updateTimerDisplay(getSelectedSeconds());
   updateOverallProgress();
   updateProgress();
@@ -157,9 +163,25 @@ function startPractice() {
   const batchSize = Math.min(getSelectedBatchSize(), remainingWords.length);
   practiceWords = remainingWords.slice(0, batchSize);
   remainingWords = remainingWords.slice(batchSize);
+  currentPracticeMode = "main";
 
   restartPractice(
     `Starting a ${practiceWords.length}-word ${getSelectedDifficulty()} batch. ${remainingWords.length} words left after this batch.`
+  );
+}
+
+function startWrongWordPractice() {
+  if (pendingWrongWords.length === 0) {
+    showFeedback("No wrong words are waiting for review right now.", "wrong");
+    return;
+  }
+
+  const batchSize = Math.min(getSelectedBatchSize(), pendingWrongWords.length);
+  practiceWords = shuffle([...pendingWrongWords]).slice(0, batchSize);
+  currentPracticeMode = "review";
+
+  restartPractice(
+    `Reviewing ${practiceWords.length} wrong words. ${pendingWrongWords.length} words still need correction.`
   );
 }
 
@@ -181,6 +203,7 @@ function restartPractice(message = "Practice reset. Starting again from word 1."
   historyList.innerHTML = `<p class="empty">No attempts yet.</p>`;
   updateScore();
   updatePauseButton();
+  updateWrongWordsButton();
   loadQuestion();
   showFeedback(message, "correct");
 }
@@ -192,9 +215,11 @@ function loadQuestion() {
   if (currentIndex >= practiceWords.length) {
     currentWord = "";
     statusIcon.textContent = "🏆";
-    progressText.textContent = remainingWords.length > 0
-      ? `Batch completed. ${remainingWords.length} ${getSelectedDifficulty()} words remaining in the pool`
-      : `Batch completed. All ${getSelectedDifficulty()} words have been used`;
+    progressText.textContent = currentPracticeMode === "review"
+      ? `Review batch completed. ${pendingWrongWords.length} wrong words still pending`
+      : remainingWords.length > 0
+        ? `Batch completed. ${remainingWords.length} ${getSelectedDifficulty()} words remaining in the pool`
+        : `Batch completed. All ${getSelectedDifficulty()} words have been used`;
     updateTimerDisplay(0);
     showFeedback(`Finished this batch! Score: ${score}/${practiceWords.length}`, "correct");
     updateProgress();
@@ -213,7 +238,9 @@ function loadQuestion() {
   feedback.className = "feedback";
   statusIcon.textContent = "🎧";
 
-  progressText.textContent = `Word ${currentIndex + 1} of ${practiceWords.length} | ${remainingWords.length} ${getSelectedDifficulty()} words still unused`;
+  progressText.textContent = currentPracticeMode === "review"
+    ? `Review word ${currentIndex + 1} of ${practiceWords.length} | ${pendingWrongWords.length} wrong words still pending`
+    : `Word ${currentIndex + 1} of ${practiceWords.length} | ${remainingWords.length} ${getSelectedDifficulty()} words still unused`;
   updateProgress();
   updatePauseButton();
   startCountdown();
@@ -275,6 +302,10 @@ function updatePauseButton() {
   pauseBtn.textContent = isPaused ? "Resume" : "Pause";
 }
 
+function updateWrongWordsButton() {
+  wrongWordsBtn.textContent = `Practice Wrong Words (${pendingWrongWords.length})`;
+}
+
 function speakWord() {
   if (!currentWord) return;
 
@@ -314,17 +345,25 @@ function checkAnswer(fromTimer = false) {
 
   if (isCorrect) {
     score++;
+    pendingWrongWords = pendingWrongWords.filter(word => word !== currentWord);
     statusIcon.textContent = "✅";
     showFeedback("Correct!", "correct");
   } else if (!userAnswer) {
+    if (!pendingWrongWords.includes(currentWord)) {
+      pendingWrongWords.push(currentWord);
+    }
     statusIcon.textContent = "⏰";
     showFeedback(`Time is up! Correct spelling: ${currentWord}`, "wrong");
   } else {
+    if (!pendingWrongWords.includes(currentWord)) {
+      pendingWrongWords.push(currentWord);
+    }
     statusIcon.textContent = "❌";
     showFeedback(`Wrong! Correct spelling: ${currentWord}`, "wrong");
   }
 
   addHistory(userAnswer || "(no answer)", currentWord, isCorrect);
+  updateWrongWordsButton();
   updateScore();
   updateProgress();
   scheduleNextQuestion();
@@ -381,7 +420,9 @@ function updateOverallProgress() {
   const completedInsideCurrentBatch = Math.min(currentIndex, practiceWords.length);
   const completedTotal = usedOutsideCurrentBatch + completedInsideCurrentBatch;
 
-  overallProgressEl.textContent = `${completedTotal}/${availableCount} completed`;
+  overallProgressEl.textContent = currentPracticeMode === "review"
+    ? `${pendingWrongWords.length} pending review`
+    : `${completedTotal}/${availableCount} completed`;
 }
 
 function updateProgress() {
@@ -492,11 +533,13 @@ document.addEventListener("keydown", event => {
 });
 
 startBtn.addEventListener("click", startPractice);
+wrongWordsBtn.addEventListener("click", startWrongWordPractice);
 pauseBtn.addEventListener("click", togglePause);
 resetBtn.addEventListener("click", () => restartPractice());
 repeatBtn.addEventListener("click", speakWord);
 submitBtn.addEventListener("click", () => checkAnswer());
 
 updatePauseButton();
+updateWrongWordsButton();
 updateTimerDisplay(getSelectedSeconds());
 loadDefaultWords();
