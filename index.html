@@ -188,6 +188,15 @@
                 <span class="timer-label">Countdown</span>
                 <div id="timerDisplay" class="timer-display">7.0s</div>
               </div>
+
+              <!-- Dictation mode toggle -->
+              <div class="control-field mode-toggle-field">
+                <label class="mode-switch-label">
+                  <input type="checkbox" id="dictationModeToggle">
+                  <span class="slider"></span>
+                  <span class="mode-text">Dictation mode (speak & reveal)</span>
+                </label>
+              </div>
             </div>
 
             <input
@@ -196,6 +205,9 @@
               placeholder="Type the spelling here"
               autocomplete="off"
             />
+
+            <!-- Revealed word area for dictation mode -->
+            <div id="revealedWordDisplay" class="revealed-word" style="display: none;"></div>
 
             <div id="feedback" class="feedback" aria-live="polite"></div>
 

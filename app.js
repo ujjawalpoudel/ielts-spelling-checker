@@ -18,6 +18,10 @@ let autoAdvanceTimer = null;
 let countdownInterval = null;
 let remainingSeconds = 0;
 
+// Dictation mode variables
+let dictationMode = false;
+let dictationAdvanceTimer = null;
+
 const scoreEl = document.getElementById("score");
 const totalEl = document.getElementById("total");
 const progressText = document.getElementById("progressText");
@@ -32,6 +36,8 @@ const difficultySelect = document.getElementById("difficultySelect");
 const batchSelect = document.getElementById("batchSelect");
 const timerSelect = document.getElementById("timerSelect");
 const timerDisplay = document.getElementById("timerDisplay");
+const dictationToggle = document.getElementById("dictationModeToggle");
+const revealedWordDisplay = document.getElementById("revealedWordDisplay");
 
 const startBtn = document.getElementById("startBtn");
 const wrongWordsBtn = document.getElementById("wrongWordsBtn");
@@ -129,11 +135,14 @@ function resetWordPool() {
   answerInput.disabled = false;
   clearAutoAdvance();
   clearCountdown();
+  if (dictationAdvanceTimer) clearTimeout(dictationAdvanceTimer);
   updatePauseButton();
   updateWrongWordsButton();
   updateTimerDisplay(getSelectedSeconds());
   updateOverallProgress();
   updateProgress();
+  if (revealedWordDisplay) revealedWordDisplay.style.display = "none";
+  if (answerInput) answerInput.style.display = "block";
 }
 
 function getSelectedSeconds() {
@@ -193,6 +202,7 @@ function restartPractice(message = "Practice reset. Starting again from word 1."
 
   clearAutoAdvance();
   clearCountdown();
+  if (dictationAdvanceTimer) clearTimeout(dictationAdvanceTimer);
   currentIndex = 0;
   score = 0;
   attempts = 0;
@@ -211,6 +221,7 @@ function restartPractice(message = "Practice reset. Starting again from word 1."
 function loadQuestion() {
   clearAutoAdvance();
   clearCountdown();
+  if (dictationAdvanceTimer) clearTimeout(dictationAdvanceTimer);
 
   if (currentIndex >= practiceWords.length) {
     currentWord = "";
@@ -223,6 +234,10 @@ function loadQuestion() {
     updateTimerDisplay(0);
     showFeedback(`Finished this batch! Score: ${score}/${practiceWords.length}`, "correct");
     updateProgress();
+    if (dictationMode) {
+      revealedWordDisplay.style.display = "none";
+      answerInput.style.display = "block";
+    }
     return;
   }
 
@@ -231,9 +246,20 @@ function loadQuestion() {
   isPaused = false;
   remainingSeconds = 0;
 
-  answerInput.value = "";
-  answerInput.disabled = false;
-  answerInput.focus();
+  // Dictation mode UI handling
+  if (dictationMode) {
+    answerInput.style.display = "none";
+    revealedWordDisplay.style.display = "flex";
+    revealedWordDisplay.textContent = "🎧 Listening...";
+    answerInput.disabled = true;
+  } else {
+    answerInput.style.display = "block";
+    revealedWordDisplay.style.display = "none";
+    answerInput.disabled = false;
+    answerInput.value = "";
+    answerInput.focus();
+  }
+
   feedback.textContent = "";
   feedback.className = "feedback";
   statusIcon.textContent = "🎧";
@@ -259,9 +285,40 @@ function startCountdown() {
 
     if (remainingSeconds <= 0) {
       clearCountdown();
-      checkAnswer(true);
+      if (dictationMode) {
+        handleDictationTimeout();
+      } else {
+        checkAnswer(true);
+      }
     }
   }, 100);
+}
+
+function handleDictationTimeout() {
+  if (!currentWord || answered) return;
+  answered = true;
+  isPaused = false;
+  clearCountdown();
+  updatePauseButton();
+
+  // Reveal the correct spelling
+  revealedWordDisplay.textContent = currentWord.toUpperCase();
+  statusIcon.textContent = "📢";
+
+  // Speak the word again
+  const repeatSpeech = new SpeechSynthesisUtterance(currentWord);
+  repeatSpeech.lang = "en-US";
+  repeatSpeech.rate = 0.7;
+  window.speechSynthesis.speak(repeatSpeech);
+
+  showFeedback(`The correct spelling is: ${currentWord}`, "correct");
+
+  // Auto-advance after 2 seconds
+  if (dictationAdvanceTimer) clearTimeout(dictationAdvanceTimer);
+  dictationAdvanceTimer = setTimeout(() => {
+    currentIndex++;
+    loadQuestion();
+  }, 2000);
 }
 
 function clearCountdown() {
@@ -279,8 +336,13 @@ function togglePause() {
 
   if (isPaused) {
     isPaused = false;
-    answerInput.disabled = false;
-    answerInput.focus();
+    if (dictationMode) {
+      answerInput.disabled = true;
+      revealedWordDisplay.style.display = "flex";
+    } else {
+      answerInput.disabled = false;
+      answerInput.focus();
+    }
     statusIcon.textContent = "🎧";
     updatePauseButton();
     showFeedback("Practice resumed.", "correct");
@@ -291,7 +353,14 @@ function togglePause() {
   isPaused = true;
   clearCountdown();
   clearAutoAdvance();
-  answerInput.disabled = true;
+  if (dictationAdvanceTimer) clearTimeout(dictationAdvanceTimer);
+  if (dictationMode) {
+    answerInput.disabled = true;
+    revealedWordDisplay.style.display = "flex";
+    revealedWordDisplay.textContent = "⏸ Paused";
+  } else {
+    answerInput.disabled = true;
+  }
   statusIcon.textContent = "⏸️";
   updatePauseButton();
   updateTimerDisplay(remainingSeconds || getSelectedSeconds());
@@ -324,6 +393,7 @@ function normalize(text) {
 }
 
 function checkAnswer(fromTimer = false) {
+  if (dictationMode) return; // typing disabled in dictation mode
   if (!currentWord || answered) return;
 
   const userAnswer = answerInput.value.trim();
@@ -456,6 +526,7 @@ function addHistory(userAnswer, correctWord, isCorrect) {
   historyList.prepend(item);
 }
 
+// Event listeners
 fileInput.addEventListener("change", event => {
   const file = event.target.files[0];
   if (!file) return;
@@ -516,6 +587,26 @@ timerSelect.addEventListener("change", () => {
     clearCountdown();
     remainingSeconds = getSelectedSeconds();
     startCountdown();
+  }
+});
+
+dictationToggle.addEventListener("change", (e) => {
+  dictationMode = e.target.checked;
+
+  if (practiceWords.length > 0 && currentWord) {
+    restartPractice(`Dictation mode ${dictationMode ? "ON" : "OFF"}. Restarting batch.`);
+  } else {
+    if (dictationMode) {
+      answerInput.style.display = "none";
+      revealedWordDisplay.style.display = "flex";
+      revealedWordDisplay.textContent = "✅ Dictation mode ready";
+      answerInput.disabled = true;
+    } else {
+      answerInput.style.display = "block";
+      revealedWordDisplay.style.display = "none";
+      answerInput.disabled = false;
+    }
+    showFeedback(`Dictation mode ${dictationMode ? "activated – listen & write on paper" : "deactivated – back to typing"}`, "correct");
   }
 });
 
