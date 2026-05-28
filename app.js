@@ -18,8 +18,9 @@ let autoAdvanceTimer = null;
 let countdownInterval = null;
 let remainingSeconds = 0;
 
-// Dictation mode variables
+// Dictation & letter-by-letter mode variables
 let dictationMode = false;
+let letterByLetterMode = false;
 let dictationAdvanceTimer = null;
 
 const scoreEl = document.getElementById("score");
@@ -37,6 +38,7 @@ const batchSelect = document.getElementById("batchSelect");
 const timerSelect = document.getElementById("timerSelect");
 const timerDisplay = document.getElementById("timerDisplay");
 const dictationToggle = document.getElementById("dictationModeToggle");
+const letterByLetterToggle = document.getElementById("letterByLetterToggle");
 const revealedWordDisplay = document.getElementById("revealedWordDisplay");
 
 const startBtn = document.getElementById("startBtn");
@@ -301,11 +303,15 @@ function handleDictationTimeout() {
   clearCountdown();
   updatePauseButton();
 
-  // Reveal the correct spelling
-  revealedWordDisplay.textContent = currentWord.toUpperCase();
+  // Reveal the correct spelling (with spaces if letter-by-letter is on)
+  if (letterByLetterMode) {
+    revealedWordDisplay.textContent = currentWord.toUpperCase().split('').join(' ');
+  } else {
+    revealedWordDisplay.textContent = currentWord.toUpperCase();
+  }
   statusIcon.textContent = "📢";
 
-  // Speak the word again
+  // Speak the word again (whole word for clarity)
   const repeatSpeech = new SpeechSynthesisUtterance(currentWord);
   repeatSpeech.lang = "en-US";
   repeatSpeech.rate = 0.7;
@@ -380,12 +386,42 @@ function speakWord() {
 
   window.speechSynthesis.cancel();
 
-  const speech = new SpeechSynthesisUtterance(currentWord);
-  speech.lang = "en-US";
-  speech.rate = 0.75;
-  speech.pitch = 1;
+  if (dictationMode && letterByLetterMode) {
+    // Spell out each letter with a short delay
+    const letters = currentWord.toUpperCase().split('');
+    let index = 0;
 
-  window.speechSynthesis.speak(speech);
+    function speakNextLetter() {
+      if (index >= letters.length) {
+        return;
+      }
+      const utterance = new SpeechSynthesisUtterance(letters[index]);
+      utterance.lang = "en-US";
+      utterance.rate = 0.8;
+      utterance.pitch = 1;
+      utterance.onend = () => {
+        index++;
+        if (index < letters.length) {
+          setTimeout(speakNextLetter, 400);
+        }
+      };
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Update display to show letters with spaces immediately
+    if (revealedWordDisplay) {
+      revealedWordDisplay.textContent = currentWord.toUpperCase().split('').join(' ');
+    }
+
+    speakNextLetter();
+  } else {
+    // Normal whole-word speech
+    const speech = new SpeechSynthesisUtterance(currentWord);
+    speech.lang = "en-US";
+    speech.rate = 0.75;
+    speech.pitch = 1;
+    window.speechSynthesis.speak(speech);
+  }
 }
 
 function normalize(text) {
@@ -607,6 +643,20 @@ dictationToggle.addEventListener("change", (e) => {
       answerInput.disabled = false;
     }
     showFeedback(`Dictation mode ${dictationMode ? "activated – listen & write on paper" : "deactivated – back to typing"}`, "correct");
+  }
+});
+
+letterByLetterToggle.addEventListener("change", (e) => {
+  letterByLetterMode = e.target.checked;
+  showFeedback(`Letter‑by‑letter spelling ${letterByLetterMode ? "ON" : "OFF"}`, "correct");
+  // If a dictation session is active, restart the current word to apply the new mode
+  if (dictationMode && currentWord && !answered) {
+    window.speechSynthesis.cancel();
+    if (dictationAdvanceTimer) clearTimeout(dictationAdvanceTimer);
+    clearCountdown();
+    remainingSeconds = getSelectedSeconds();
+    startCountdown();
+    setTimeout(() => speakWord(), 100);
   }
 });
 
