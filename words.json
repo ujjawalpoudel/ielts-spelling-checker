@@ -18,7 +18,6 @@
     "tutor",
     "schedule",
     "vocabulary",
-    "proofreading",
     "experiment",
     "supervisor",
     "overseas",
@@ -90,8 +89,7 @@
     "moisture",
     "catalogue",
     "statistic",
-    "newsletter",
-    "manufacture"
+    "newsletter"
   ],
   "hard": {
     "spelling_traps": [
@@ -178,7 +176,6 @@
       "assessment",
       "specialist",
       "registrar",
-      "publication",
       "retention",
       "intermediate",
       "introductory",
@@ -188,7 +185,6 @@
       "ecological",
       "conservation",
       "contaminated",
-      "hydroelectric",
       "deforestation",
       "greenhouse",
       "avalanche",
@@ -197,20 +193,10 @@
       "erosion",
       "vegetation",
       "renewable",
-      "receptionist"
-    ],
-    "confusing_words": [
-      "principal",
-      "principle",
-      "stationary",
-      "stationery",
+      "receptionist",
       "council",
       "draft",
       "draught",
-      "loose",
-      "lose",
-      "quiet",
-      "quite",
       "weather"
     ]
   }
