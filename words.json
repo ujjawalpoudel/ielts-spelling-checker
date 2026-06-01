@@ -3,7 +3,6 @@
     "appointment",
     "valuable",
     "yogurt",
-    "enquiry",
     "commute",
     "shuttle",
     "ferry",
@@ -77,6 +76,7 @@
     "moisture",
     "catalogue",
     "statistic",
+    "repetitive"
   ],
   "hard": {
     "spelling_traps": [
