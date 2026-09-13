@@ -82,18 +82,30 @@ function cleanWords(data) {
 }
 
 function setWordData(data) {
-  const mediumWords = Array.isArray(data?.medium) ? cleanWords(data.medium) : [];
-  const hardWords = data?.hard ? cleanWords(data.hard) : [];
+  wordsByDifficulty = {};
+
+  if (typeof data === "object" && data !== null && !Array.isArray(data)) {
+    // Dynamically map every top-level key (like "Day 1", "medium", "hard")
+    Object.keys(data).forEach(key => {
+      wordsByDifficulty[key] = cleanWords(data[key]);
+    });
+  }
+
+  // Fallback if data is a flat array
   const fallbackWords = Array.isArray(data) ? cleanWords(data) : [];
 
-  wordsByDifficulty = {
-    medium: mediumWords.length > 0 ? mediumWords : fallbackWords,
-    hard: hardWords,
-    all: cleanWords(data)
-  };
+  // Always make sure an "all" category exists containing everything
+  let allWords = [];
+  Object.values(wordsByDifficulty).forEach(list => allWords.push(...list));
+  
+  if (allWords.length === 0) {
+    allWords = fallbackWords;
+  }
 
-  if (wordsByDifficulty.all.length === 0) {
-    wordsByDifficulty.all = [...new Set([...wordsByDifficulty.medium, ...wordsByDifficulty.hard])];
+  wordsByDifficulty.all = [...new Set(allWords)];
+
+  if (!wordsByDifficulty.medium) {
+    wordsByDifficulty.medium = wordsByDifficulty.all;
   }
 
   words = wordsByDifficulty.all;
