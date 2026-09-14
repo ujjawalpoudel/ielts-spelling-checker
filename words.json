@@ -79,19 +79,25 @@
       "hurricane",
       "erosion",
       "vegetation",
-      "receptionist"
+      "receptionist",
+      "sedentary",
+      "conscious",
+      "obesity",
+      "intolerance",
+      "anxiety",
+      "depression",
+      "deprivation",
+      "telemedicine",
+      "infectious",
+      "chronic",
+      "acute",
+      "recovery",
+      "outbreak",
+      "pandemic",
+      "epidemic",
+      "sanitation",
+      "premature",
+      "life expectancy"
     ]
-  },
-  "Day 1": [
-    "Relinquish",
-    "Reluctant",
-    "Pledge",
-    "Ambiguity",
-    "Rhetoric",
-    "Irony",
-    "Heuristic",
-    "Aesthetic",
-    "Eavesdrop",
-    "Stigma"
-  ]
+  }
 }
