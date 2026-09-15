@@ -14,7 +14,6 @@
     "lecturer",
     "deposit",
     "mortgage",
-    "merchandise",
     "recruitment",
     "embassy",
     "colleague",
@@ -52,7 +51,7 @@
       "repetition",
       "sincerely",
       "guarantee",
-      "February",
+      "february",
       "psychologist",
       "archaeology",
       "entrepreneur",
@@ -116,11 +115,11 @@
       "literacy",
       "asylum",
       "refugee",
-      "Merchandise",
-      "Convenience Store",
-      "Affordable",
-      "Bargain",
-      "Reliable"
+      "merchandise",
+      "convenience store",
+      "affordable",
+      "bargain",
+      "reliable"
     ]
   }
 }
