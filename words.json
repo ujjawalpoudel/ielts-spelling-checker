@@ -44,7 +44,10 @@
     "commute",
     "syllabus",
     "assignment",
-    "creativity"
+    "creativity",
+    "supervisor",
+    "freelancer",
+    "ambition"
   ],
   "hard": {
     "spelling_traps": [
@@ -150,7 +153,11 @@
       "institution",
       "collaboration",
       "intellectual",
-      "concentration"
+      "concentration",
+      "resignation",
+      "retirement",
+      "apprenticeship",
+      "professionalism"
     ]
   }
 }
