@@ -28,7 +28,10 @@
     "moisture",
     "catalogue",
     "statistic",
-    "repetitive"
+    "repetitive",
+    "boutique",
+    "warranty",
+    "counterfeit"
   ],
   "hard": {
     "spelling_traps": [
