@@ -31,7 +31,11 @@
     "repetitive",
     "boutique",
     "warranty",
-    "counterfeit"
+    "counterfeit",
+    "commercial",
+    "audience",
+    "influential",
+    "sensational"
   ],
   "hard": {
     "spelling_traps": [
@@ -120,7 +124,13 @@
       "convenience store",
       "affordable",
       "bargain",
-      "reliable"
+      "reliable",
+      "advertisement",
+      "campaign",
+      "credible",
+      "controversial",
+      "censorship",
+      "surveillance"
     ]
   }
 }
