@@ -47,7 +47,9 @@
     "creativity",
     "supervisor",
     "freelancer",
-    "ambition"
+    "ambition",
+    "leisure",
+    "hobbies"
   ],
   "hard": {
     "spelling_traps": [
@@ -157,7 +159,9 @@
       "resignation",
       "retirement",
       "apprenticeship",
-      "professionalism"
+      "professionalism",
+      "minimalism",
+      "workaholic"
     ]
   }
 }
