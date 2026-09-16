@@ -35,7 +35,10 @@
     "commercial",
     "audience",
     "influential",
-    "sensational"
+    "sensational",
+    "bungalow",
+    "furnished",
+    "balcony"
   ],
   "hard": {
     "spelling_traps": [
@@ -69,7 +72,8 @@
       "opportunity",
       "temperature",
       "achievement",
-      "knowledgeable"
+      "knowledgeable",
+      "neighbour"
     ],
     "academic_and_topic_words": [
       "philosophy",
@@ -130,7 +134,9 @@
       "credible",
       "controversial",
       "censorship",
-      "surveillance"
+      "surveillance",
+      "residence",
+      "amenities"
     ]
   }
 }
