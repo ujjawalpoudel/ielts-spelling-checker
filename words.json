@@ -40,7 +40,11 @@
     "furnished",
     "balcony",
     "pedestrian",
-    "carpooling"
+    "carpooling",
+    "commute",
+    "syllabus",
+    "assignment",
+    "creativity"
   ],
   "hard": {
     "spelling_traps": [
@@ -75,7 +79,8 @@
       "temperature",
       "achievement",
       "knowledgeable",
-      "neighbour"
+      "neighbour",
+      "discipline"
     ],
     "academic_and_topic_words": [
       "philosophy",
@@ -140,7 +145,12 @@
       "residence",
       "amenities",
       "traffic congestion",
-      "renewable energy"
+      "renewable energy",
+      "curriculum",
+      "institution",
+      "collaboration",
+      "intellectual",
+      "concentration"
     ]
   }
 }
