@@ -35,3 +35,7 @@ node_modules/
 
 # Env files
 .env
+
+# Codebase export tooling (not part of the actual project)
+export_codebase.py
+project_dump.txt

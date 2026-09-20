@@ -1,4 +1,5 @@
 {
+  "easy":[],
   "medium": [
     "individual",
     "yogurt",
@@ -33,8 +34,7 @@
     "leisure",
     "hobbies"
   ],
-  "hard": {
-    "spelling_traps": [
+  "hard": [
       "accommodation",
       "development",
       "embarrassment",
@@ -67,9 +67,7 @@
       "achievement",
       "knowledgeable",
       "neighbour",
-      "discipline"
-    ],
-    "academic_and_topic_words": [
+      "discipline",
       "philosophy",
       "linguistics",
       "sustainability",
@@ -162,5 +160,4 @@
       "attendance",
       "skyscraper"
     ]
-  }
 }
